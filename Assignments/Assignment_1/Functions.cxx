@@ -62,6 +62,45 @@ void task1(){
     myData.close();
 }
 
+std::tuple<std::vector<double>, std::vector<double>> read_data(const std::string & filename, char delimiter = ',') {
+    std::ifstream myData;
+    myData.open(filename);
+    if (!myData.is_open()) {
+        std::cout << "Error opening file" << std::endl;
+        exit(1);
+    }
+
+    // Skip the Header line (in our case x,y) if it's applicable
+    std::string line;
+    std::getline(myData, line); // Consume the header line if present
+
+    // Initializing the arrays
+    std::vector<double> x_arr;
+    std::vector<double> y_arr;
+
+    // Iterating through the now read-in file to get the x and y values
+    double x, y;
+    while (std::getline(myData, line)) {
+        // Use an istringstream to parse the values separated by the given delimiter
+        std::istringstream ss(line);
+        std::string token;
+
+        // Read the values separated by the specified delimiter
+        std::getline(ss, token, delimiter);
+        x = std::stod(token); // Convert the string to the template type
+
+        std::getline(ss, token);
+        y = std::stod(token); // Convert the string to the template type
+
+        // Adding the values to the arrays
+        x_arr.push_back(x);
+        y_arr.push_back(y);
+    }
+    myData.close();
+
+    return std::make_tuple(x_arr, y_arr); // Returning the tuple
+}
+
 std::tuple<std::vector<double>, std::vector<double>> read_data() {  //Initialising a tuple of vectors as the chosen data structure
 
      // Opening File
@@ -110,8 +149,8 @@ std::tuple<std::vector<double>, std::vector<double>> read_data() {  //Initialisi
 // This is a shorter function to print out the vectors, but doesnt use the print_lines function. Confused as in wehich oen to sue as this seems to be simpler (fewer lines) and produce a more tailored output.
 void print_vectors(const std::vector<double> & x_array, const std::vector<double> & y_array, std::size_t n, bool useFull_flag) { 
     if (useFull_flag == true) {
-        n = x_array.size();
-        for (int i = 0; i < n; ++i) {
+        int z = x_array.size();
+        for (int i = 0; i < z; ++i) {
         std::cout << "Line " << i + 1 << ": " << x_array[i] << ", " << y_array[i]<< std::endl;
         }
     }
@@ -122,12 +161,19 @@ void print_vectors(const std::vector<double> & x_array, const std::vector<double
                 std::cout << "Line " << i + 1 << ": " << x_array[i] << ", " << y_array[i]<< std::endl;
             }
         }
+        else if (n < 1) {
+            std::cout << "Error: Number of lines to be printed must be greater than 0. Printing the first 5 lines." << std::endl;
+            for (int i = 0; i < 5; ++i) {
+                std::cout << "Line " << i + 1 << ": " << x_array[i] << ", " << y_array[i]<< std::endl;
+            }
+        }
         else {
             for (int i = 0; i < n; ++i) {
                 std::cout << "Line " << i + 1 << ": " << x_array[i] << ", " << y_array[i]<< std::endl;
-                }
             }
+        }
     }
+    std:: cout << " " << std::endl;
 }
 
 
@@ -179,3 +225,37 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> vector
     return std::make_tuple(x_array, y_array, mag_array);
 }
 
+std::tuple<double, double> least_squares(const std::vector<double> & x, const std::vector<double> & y) {
+    double N = x.size();
+    double sum_x_i = 0, sum_y_i = 0, sum_xx_i = 0, sum_xy_i = 0;
+    for (int i = 0; i < N; ++i) {
+        sum_x_i += x[i];
+        sum_y_i += y[i];
+        sum_xx_i += x[i]*x[i];
+        sum_xy_i += x[i]*y[i];
+    }
+    
+    double p = (N*sum_xy_i - sum_x_i*sum_y_i)/(N*sum_xx_i - sum_x_i*sum_x_i);
+    double q = (sum_xx_i*sum_y_i - sum_xy_i*sum_x_i)/(N*sum_xx_i - sum_x_i*sum_x_i);
+
+    return std::make_tuple(p, q);
+}
+
+void writeStringToFile(const std::string& content, const std::string& filename) {
+    // Open a file for writing
+    std::ofstream outFile(filename);
+
+    // Check if the file is open
+    if (!outFile.is_open()) {
+        std::cerr << "Error opening the file." << std::endl;
+        return;
+    }
+
+    // Write the string to the file
+    outFile << content;
+
+    // Close the file
+    outFile.close();
+
+    //std::cout << "String has been written to the file: " << filename << std::endl;
+}
