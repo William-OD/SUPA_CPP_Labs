@@ -1,0 +1,3 @@
+The best fit (straight) line to the data is y = 0.126266*x + 2.026278
+Chi-Squared: 2949.227830
+Reduced Chi-Squared: 128.227297

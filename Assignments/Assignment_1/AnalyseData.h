@@ -17,7 +17,7 @@ void print_vectors(const std::vector<double> & x_array, const std::vector<double
 
 std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> vectorMag(const std::vector<double> & x_array, const std::vector<double> & y_array);
 
-std::tuple<double, double> least_squares(const std::vector<double> & x, const std::vector<double> & y);
+std::tuple<double, double, double, double> leastsq_chisq(std::vector<double> x, std::vector<double> y, std::vector<double> x_err, std::vector<double> y_err);
 
 void writeStringToFile(const std::string& content, const std::string& filename);
 

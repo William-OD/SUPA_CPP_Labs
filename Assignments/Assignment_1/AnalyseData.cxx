@@ -6,14 +6,6 @@ Assignment 1 -Main Tasks
 
 #include "AnalyseData.h"
 
-#include <iostream> //Compiler directive to include the iostream standard file
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <cmath>
-#include <tuple>
-
-
 int main() 
 {
 
@@ -33,9 +25,10 @@ int main()
     std::cout << "Would you like to print the x, y data or the magnitudes? (data, m)" << std::endl;
     std::string choice;
     std::cin >> choice;
+    std::cout << " "<< std::endl;
     if (choice == "data") {
         bool print_all = false; //Print all lines if true, else print num_lines
-        std::cout << "How many lines of data would you like to print? (Maximum 25)" << std::endl;
+        std::cout << "How many lines of data would you like to print? (Maximum "<< x_arr.size() <<")" << std::endl;
         int num_lines;
         std::cin >> num_lines;
         print_vectors(x_arr, y_arr, num_lines, print_all);
@@ -61,20 +54,26 @@ int main()
    Additional Instructions: */
 
 /*Calculate gradient and intercept of least squares fit*/
-    auto Least_sq_result = least_squares(x_arr, y_arr);
-    double grad_val = std::get<0>(Least_sq_result);
-    double intercept_val = std::get<1>(Least_sq_result); 
 
-    //Write equation to file and terminal
-    std::string equation = "y = " + std::to_string(grad_val) + "*x + " + std::to_string(intercept_val);
-
-    std::string file_out = "output_equation.txt";
-    writeStringToFile(equation, file_out); //Write the linear best fit equation to a file
-    std::cout << "Calculating the best fit line for all the data..." << std::endl;
-    std::cout << "The equation of the best fit line is: " << equation << std::endl;
 
 /* Calculate Chi-Squared Values*/
 
+    auto err_data = read_data("error2D_float.txt");
+    std::vector<double> x_arr_err = std::get<0>(err_data);
+    std::vector<double> y_arr_err = std::get<1>(err_data);
+    auto lsq_chisq_result = leastsq_chisq(x_arr, y_arr, x_arr_err, y_arr_err);
+    double grad_val = std::get<0>(lsq_chisq_result);
+    double intercept_val = std::get<1>(lsq_chisq_result); 
+    double chi_sq = std::get<2>(lsq_chisq_result);
+    double red_chi_sq = std::get<3>(lsq_chisq_result);
+
+    //Write information to file and terminal
+    std::cout << " " << std::endl;
+    std::string info = "The best fit (straight) line to the data is y = " + std::to_string(grad_val) + "*x + " + std::to_string(intercept_val) + "\n" + "Chi-Squared: " + std::to_string(chi_sq) + "\n" + "Reduced Chi-Squared: " + std::to_string(red_chi_sq);
+    std::string file_out = "output_Data.txt";
+    writeStringToFile(info, file_out);
+
+    std::cout << info << std::endl;
 
     return 0;
 }

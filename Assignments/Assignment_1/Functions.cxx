@@ -225,7 +225,7 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> vector
     return std::make_tuple(x_array, y_array, mag_array);
 }
 
-std::tuple<double, double> least_squares(const std::vector<double> & x, const std::vector<double> & y) {
+std::tuple<double, double> leastsq_chisq(const std::vector<double> & x, const std::vector<double> & y) {
     double N = x.size();
     double sum_x_i = 0, sum_y_i = 0, sum_xx_i = 0, sum_xy_i = 0;
     for (int i = 0; i < N; ++i) {
@@ -258,4 +258,34 @@ void writeStringToFile(const std::string& content, const std::string& filename) 
     outFile.close();
 
     //std::cout << "String has been written to the file: " << filename << std::endl;
+}
+
+std::tuple<double, double, double, double> leastsq_chisq(std::vector<double> x, std::vector<double> y, std::vector<double> x_err, std::vector<double> y_err) {
+    int N = x.size();
+    double sum_x_i = 0, sum_y_i = 0, sum_xx_i = 0, sum_xy_i = 0, Chi_sq_sum = 0;
+    for (int i = 0; i < N; ++i) {
+        sum_x_i += x[i];
+        sum_y_i += y[i];
+        sum_xx_i += x[i]*x[i];
+        sum_xy_i += x[i]*y[i];
+    }
+    
+    double p = (N*sum_xy_i - sum_x_i*sum_y_i)/(N*sum_xx_i - sum_x_i*sum_x_i);
+    double q = (sum_xx_i*sum_y_i - sum_xy_i*sum_x_i)/(N*sum_xx_i - sum_x_i*sum_x_i);
+
+    for (int i = 0; i < N; ++i) {
+        double expected_y = (x[i]*p + q); //Expected y values calculated from y = mx+c
+        double num = (y[i] - expected_y)*(y[i] - expected_y); //Numerator of Chi-squared equation
+        double den =  x_err[i]*p*x_err[i]*p + y_err[i]*y_err[i]; //Total squared error in y. [Y_expected_err = m*x_err + c_err = m*x_err]
+        double Chi_sq = num/den;
+        Chi_sq_sum += Chi_sq;
+    }
+
+    double red_chi_sq = Chi_sq_sum/(N-2);
+
+    // std::cout << "Chi-Squared Sum: " << Chi_sq_sum << std::endl;
+    // std::cout << "To calculate the reduced chi-squared value, we need to divide this by the number of data points (" << N << ") minus the number of degrees of freedom (2)." << std::endl;
+    // std::cout << "Therefore the reduced chi-squared value is: "<< red_chi_sq << std::endl;
+
+    return std::make_tuple(p, q, Chi_sq_sum, red_chi_sq);
 }
