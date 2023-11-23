@@ -37,8 +37,7 @@ int main()
     }
     else if (choice == "m") {
         //Calculate and print magnitudes
-        auto data_mag = vectorMag(x_arr, y_arr);
-        std::vector<double> mag_arr = std::get<2>(data_mag);
+        std::vector<double> mag_arr = vectorMag(x_arr, y_arr);
         int c = mag_arr.size();
         std::string fname_mag = "output_magnitudes.txt";
         std::string header_mag = "Magnitudes";
