@@ -31,21 +31,22 @@ int main()
         std::cout << "How many lines of data would you like to print? (Maximum "<< x_arr.size() <<")" << std::endl;
         int num_lines;
         std::cin >> num_lines;
-        print_vectors(x_arr, y_arr, num_lines, print_all);
+        std::cout << " " << std::endl;
+        std::string header_data = "(x, y)";
+        print_vectors(header_data, x_arr, y_arr, num_lines, print_all);
     }
     else if (choice == "m") {
         //Calculate and print magnitudes
         auto data_mag = vectorMag(x_arr, y_arr);
         std::vector<double> mag_arr = std::get<2>(data_mag);
         int c = mag_arr.size();
-        std::cout << "Magnitudes: " ;
-        for (int i = 0; i < c; ++i) {
-            std::cout << mag_arr[i] << ", ";
-        }
-        std::cout << std::endl;
+        std::string fname_mag = "output_magnitudes.txt";
+        std::string header_mag = "Magnitudes";
+        print_vectors(header_mag, mag_arr);
+        writeToFile("output_Magnitudes.txt", header_mag, mag_arr);
 
     }
-    else {
+    else {   
         std::cout << "Invalid input, please enter 'data' or 'm'" << std::endl;
     }
 
@@ -67,13 +68,19 @@ int main()
     double chi_sq = std::get<2>(lsq_chisq_result);
     double red_chi_sq = std::get<3>(lsq_chisq_result);
 
-    //Write information to file and terminal
-    std::cout << " " << std::endl;
-    std::string info = "The best fit (straight) line to the data is y = " + std::to_string(grad_val) + "*x + " + std::to_string(intercept_val) + "\n" + "Chi-Squared: " + std::to_string(chi_sq) + "\n" + "Reduced Chi-Squared: " + std::to_string(red_chi_sq);
+    std::string fit_info = "The best fit (straight) line to the data is y = " + std::to_string(grad_val) + "*x + " + std::to_string(intercept_val) + "\n" + "Chi-Squared: " + std::to_string(chi_sq) + "\n" + "Reduced Chi-Squared: " + std::to_string(red_chi_sq);
     std::string file_out = "output_Data.txt";
-    writeStringToFile(info, file_out);
+    std::cout << fit_info << std::endl;
+    std::cout << " "<< std::endl;
+    writeToFile("output_Fit.txt", fit_info);
 
-    std::cout << info << std::endl;
+
+/* Calculate x to the power of y*/
+    std::vector<double> xpowy_arr;
+    XpowY(x_arr, y_arr, xpowy_arr, 0);
+    std::string header_xpowy = "x^y";
+    print_vectors(header_xpowy, xpowy_arr);
+    writeToFile("output_XpowY.txt", header_xpowy, xpowy_arr);
 
     return 0;
 }

@@ -13,12 +13,16 @@ void task_1();
 
 std::tuple<std::vector<double>, std::vector<double>> read_data(const std::string & filename, char delimiter = ',');
 
-void print_vectors(const std::vector<double> & x_array, const std::vector<double> & y_array, std::size_t n, bool useFull_flag);
+void print_vectors(const std::string &, const std::vector<double> & x_array);
+void print_vectors(const std::string &, const std::vector<double> & x_array, const std::vector<double> & y_array, std::size_t n, bool useFull_flag);
 
 std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> vectorMag(const std::vector<double> & x_array, const std::vector<double> & y_array);
 
 std::tuple<double, double, double, double> leastsq_chisq(std::vector<double> x, std::vector<double> y, std::vector<double> x_err, std::vector<double> y_err);
 
-void writeStringToFile(const std::string& content, const std::string& filename);
+void XpowY(const std::vector<double> & x_arr, const std::vector<double> & y_arr, std::vector<double> & xpowy_arr, std::size_t i);
+
+void writeToFile(const std::string & filename, const std::string &);
+void writeToFile(const std::string & filename, const std::string & , const std::vector<double> &);
 
 #endif // ANALYSEDATA_H
