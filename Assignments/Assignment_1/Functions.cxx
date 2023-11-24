@@ -192,22 +192,22 @@ void writeToFile(const std::string & filename, const std::string & header, const
         if (n > vector_1.size()) {
             std::cout << "Error: Number of lines to be printed is greater than the number of lines in the file. Printing the first 5 lines." << std::endl;
             for (int i=0; i<n; i++) {
-                outFile << vector_1[i] << vector_2[i] << std::endl;
-            }S
+                outFile << vector_1[i] << ", " << vector_2[i] << std::endl;
+            }
             std::cout << " " << std::endl;
             std::cout << "Data written to " << filename << std::endl;
         }
         else if (n < 1) {
             std::cout << "Error: Number of lines to be printed must be greater than 0. Printing the first 5 lines." << std::endl;
             for (int i=0; i<n; i++) {
-            outFile << vector_1[i] << vector_2[i] << std::endl;
+            outFile << vector_1[i] <<  ", " << vector_2[i] << std::endl;
             }
             std::cout << " " << std::endl;
             std::cout << "Data written to " << filename << std::endl;
         }
         else {
             for (int i=0; i<n; i++) {
-            outFile << vector_1[i] << vector_2[i] << std::endl;
+            outFile << vector_1[i] << ", " << vector_2[i] << std::endl;
             }
             std::cout << " " << std::endl;
             std::cout << "Data written to " << filename << std::endl;
