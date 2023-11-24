@@ -1,3 +1,9 @@
+/* William O'Donnell 
+24/11/23
+C++ SUPA Course
+Assignment 1 - Functions file
+*/
+
 #include <iostream> //Compiler directive to include the iostream standard file
 #include <fstream>
 #include <sstream>
@@ -57,33 +63,26 @@ std::tuple<std::vector<double>, std::vector<double>> read_data(const std::string
 
 //Inputs the x and y data, number of lines to be printed, and a boolean to print all lines if true.
 void print_vectors(const std::string &,const std::vector<double> &, const std::vector<double> &, std::size_t, bool);
-void print_vectors(const std::string & header, const std::vector<double> & x_array, const std::vector<double> & y_array, std::size_t n, bool useFull_flag) { 
-    if (useFull_flag == true) {
-        int z = x_array.size();
-        for (int i = 0; i < z; ++i) {
-        std::cout << "Line " << i + 1 << ": " << x_array[i] << ", " << y_array[i]<< std::endl;
+void print_vectors(const std::string & header, const std::vector<double> & x_array, const std::vector<double> & y_array, std::size_t n) { 
+
+    if (n > x_array.size()) {
+        std::cout << "Error: Number of lines to be printed is greater than the number of lines in the file. Printing the first 5 lines." << std::endl;
+        std::cout << "        " << header << std::endl;
+        for (int i = 0; i < 5; ++i) {
+            std::cout << "Line " << i + 1 << ": " << x_array[i] << ", " << y_array[i]<< std::endl;
+        }
+    }
+    else if (n < 1) {
+        std::cout << "Error: Number of lines to be printed must be greater than 0. Printing the first 5 lines." << std::endl;
+        std::cout << "        " << header << std::endl;
+        for (int i = 0; i < 5; ++i) {
+            std::cout << "Line " << i + 1 << ": " << x_array[i] << ", " << y_array[i]<< std::endl;
         }
     }
     else {
-        if (n > x_array.size()) {
-            std::cout << "Error: Number of lines to be printed is greater than the number of lines in the file. Printing the first 5 lines." << std::endl;
-            std::cout << "        " << header << std::endl;
-            for (int i = 0; i < 5; ++i) {
-                std::cout << "Line " << i + 1 << ": " << x_array[i] << ", " << y_array[i]<< std::endl;
-            }
-        }
-        else if (n < 1) {
-            std::cout << "Error: Number of lines to be printed must be greater than 0. Printing the first 5 lines." << std::endl;
-            std::cout << "        " << header << std::endl;
-            for (int i = 0; i < 5; ++i) {
-                std::cout << "Line " << i + 1 << ": " << x_array[i] << ", " << y_array[i]<< std::endl;
-            }
-        }
-        else {
-            std::cout << "        " << header << std::endl;
-            for (int i = 0; i < n; ++i) {
-                std::cout << "Line " << i + 1 << ": (" << x_array[i] << ", " << y_array[i] << ")" << std::endl;
-            }
+        std::cout << "        " << header << std::endl;
+        for (int i = 0; i < n; ++i) {
+            std::cout << "Line " << i + 1 << ": (" << x_array[i] << ", " << y_array[i] << ")" << std::endl;
         }
     }
     std:: cout << " " << std::endl;
@@ -177,7 +176,42 @@ void writeToFile(const std::string & filename, const std::string & header, const
       for (int i=0; i<n; i++) {
          outFile << vector_1[i] << std::endl;
       }
+    std::cout << "File written to " << filename << std::endl;
     outFile.close();
+}
+//Writing two 1-D Vectors to file, with the number of lines specified by the user
+void writeToFile(const std::string & filename, const std::string & , const std::vector<double> &, const std::vector<double> &, std::size_t);
+void writeToFile(const std::string & filename, const std::string & header, const std::vector<double> & vector_1, const std::vector<double> & vector_2, std::size_t n){
+    std::ofstream outFile(filename);
+    if (!outFile.is_open()) {
+        std::cerr << "Error opening the file." << std::endl;
+        return;
+    }
+    else {
+        outFile << header << std::endl;
+        if (n > vector_1.size()) {
+            std::cout << "Error: Number of lines to be printed is greater than the number of lines in the file. Printing the first 5 lines." << std::endl;
+            for (int i=0; i<n; i++) {
+                outFile << vector_1[i] << vector_2[i] << std::endl;
+            }
+            std::cout << "File written to " << filename << std::endl;
+        }
+        else if (n < 1) {
+            std::cout << "Error: Number of lines to be printed must be greater than 0. Printing the first 5 lines." << std::endl;
+            for (int i=0; i<n; i++) {
+            outFile << vector_1[i] << vector_2[i] << std::endl;
+            }
+        std::cout << "File written to " << filename << std::endl;
+        }
+        else {
+            for (int i=0; i<n; i++) {
+            outFile << vector_1[i] << vector_2[i] << std::endl;
+            }
+        std::cout << "File written to " << filename << std::endl;
+        }
+        std:: cout << " " << std::endl;
+        outFile.close();
+    }
 }
 //Write the best fit function, and chi-square values.
 void writeToFile(const std::string & filename, const std::string & );
@@ -188,5 +222,6 @@ void writeToFile(const std::string & filename, const std::string & header){
         return;
     }
     outFile << header << std::endl;
+    std::cout << "File written to " << filename << std::endl;
     outFile.close();
 }
