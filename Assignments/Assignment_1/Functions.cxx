@@ -194,6 +194,7 @@ void writeToFile(const std::string & filename, const std::string & header, const
             for (int i=0; i<n; i++) {
                 outFile << vector_1[i] << vector_2[i] << std::endl;
             }
+            std::cout << " " << std::endl;
             std::cout << "File written to " << filename << std::endl;
         }
         else if (n < 1) {
@@ -201,13 +202,15 @@ void writeToFile(const std::string & filename, const std::string & header, const
             for (int i=0; i<n; i++) {
             outFile << vector_1[i] << vector_2[i] << std::endl;
             }
-        std::cout << "File written to " << filename << std::endl;
+            std::cout << " " << std::endl;
+            std::cout << "File written to " << filename << std::endl;
         }
         else {
             for (int i=0; i<n; i++) {
             outFile << vector_1[i] << vector_2[i] << std::endl;
             }
-        std::cout << "File written to " << filename << std::endl;
+            std::cout << " " << std::endl;
+            std::cout << "File written to " << filename << std::endl;
         }
         std:: cout << " " << std::endl;
         outFile.close();
