@@ -160,8 +160,8 @@ void XpowY(const std::vector<double> & x_arr, const std::vector<double> & y_arr,
 }
 
 /*----------------------------------------------------------------------------------------------------
---------------Function: print_vectors() contains overloads to print out the a-------------------------
---------------1-D vector and a header, or just a 1-D vector.------------------------------------------
+--------------Function: writeToFile() contains overloads to print out the a---------------------------
+--------------1-D vector and a header, two 1-D vectors and a header, or just a header.----------------
 ----------------------------------------------------------------------------------------------------*/
 //Writing one 1-D Vector to file
 void writeToFile(const std::string & filename, const std::string & , const std::vector<double> &);
@@ -193,9 +193,9 @@ void writeToFile(const std::string & filename, const std::string & header, const
             std::cout << "Error: Number of lines to be printed is greater than the number of lines in the file. Printing the first 5 lines." << std::endl;
             for (int i=0; i<n; i++) {
                 outFile << vector_1[i] << vector_2[i] << std::endl;
-            }
+            }S
             std::cout << " " << std::endl;
-            std::cout << "File written to " << filename << std::endl;
+            std::cout << "Data written to " << filename << std::endl;
         }
         else if (n < 1) {
             std::cout << "Error: Number of lines to be printed must be greater than 0. Printing the first 5 lines." << std::endl;
@@ -203,14 +203,14 @@ void writeToFile(const std::string & filename, const std::string & header, const
             outFile << vector_1[i] << vector_2[i] << std::endl;
             }
             std::cout << " " << std::endl;
-            std::cout << "File written to " << filename << std::endl;
+            std::cout << "Data written to " << filename << std::endl;
         }
         else {
             for (int i=0; i<n; i++) {
             outFile << vector_1[i] << vector_2[i] << std::endl;
             }
             std::cout << " " << std::endl;
-            std::cout << "File written to " << filename << std::endl;
+            std::cout << "Data written to " << filename << std::endl;
         }
         std:: cout << " " << std::endl;
         outFile.close();
