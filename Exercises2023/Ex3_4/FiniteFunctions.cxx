@@ -8,21 +8,52 @@
 
 using std::filesystem::path;
 
-//Empty constructor
+//Empty constructors
 FiniteFunction::FiniteFunction(){
   m_RMin = -10.0;
   m_RMax = 10.0;
   this->checkPath("DefaultFunction");
   m_Integral = NULL;
 }
+NormalFunction::NormalFunction() : FiniteFunction() {
+    m_stddev = 1.0;
+    m_mean = 0.0;
+    this->checkPath("NormalFunction");
+}
+CauchyLorentzFunction::CauchyLorentzFunction() : FiniteFunction() {
+    m_x0 = 0.0;
+    m_gamma = 1.0;
+    this->checkPath("CauchyLorentzFunction");
+}
+NegativeCrystalBallFunction::NegativeCrystalBallFunction() : NormalFunction() {
+    m_alpha = 1.0;
+    m_n = 1.0;
+    this->checkPath("NegativeCrystalBallFunction");
+}
 
-//initialised constructor
-FiniteFunction::FiniteFunction(double range_min, double range_max, std::string outfile){
-  m_RMin = range_min;
-  m_RMax = range_max;
+//initialised constructors
+FiniteFunction::FiniteFunction(double min_range, double max_range, std::string outfile){
+  m_RMin = min_range;
+  m_RMax = max_range;
   m_Integral = NULL;
   this->checkPath(outfile); //Use provided string to name output files
 }
+NormalFunction::NormalFunction(double min_range, double max_range, std::string outfile, double stddev, double mean)
+    : FiniteFunction(min_range, max_range, outfile) {
+    m_stddev = stddev;
+    m_mean = mean;
+}
+CauchyLorentzFunction::CauchyLorentzFunction(double min_range, double max_range, std::string outfile, double gamma, double x0)
+    : FiniteFunction(min_range, max_range, outfile) {
+    m_x0 = x0;
+    m_gamma = gamma;
+}
+NegativeCrystalBallFunction::NegativeCrystalBallFunction(double min_range, double max_range, std::string outfile, double alpha, double n, double stddev, double mean)
+    : NormalFunction(min_range, max_range, outfile, stddev, mean) {
+    m_alpha = alpha;
+    m_n = n;
+}
+
 
 //Plots are called in the destructor
 //SUPACPP note: They syntax of the plotting code is not part of the course
@@ -40,6 +71,15 @@ void FiniteFunction::setRangeMin(double RMin) {m_RMin = RMin;};
 void FiniteFunction::setRangeMax(double RMax) {m_RMax = RMax;};
 void FiniteFunction::setOutfile(std::string Outfile) {this->checkPath(Outfile);};
 
+void NormalFunction::setStdDev(double stddev) {m_stddev = stddev;};
+void NormalFunction::setMean(double mean) {m_mean = mean;};
+
+void CauchyLorentzFunction::setX0(double x0) {m_x0 = x0;};
+void CauchyLorentzFunction::setGamma(double gamma) {m_gamma = gamma;};
+
+void NegativeCrystalBallFunction::setAlpha(double alpha) {m_alpha = alpha;};
+void NegativeCrystalBallFunction::setN(double n) {m_n = n;};
+
 /*
 ###################
 //Getters
@@ -48,13 +88,74 @@ void FiniteFunction::setOutfile(std::string Outfile) {this->checkPath(Outfile);}
 double FiniteFunction::rangeMin() {return m_RMin;};
 double FiniteFunction::rangeMax() {return m_RMax;};
 
+double NormalFunction::getStdDev() {return m_stddev;};
+double NormalFunction::getMean() {return m_mean;};
+
+double CauchyLorentzFunction::getX0() {return m_x0;};
+double CauchyLorentzFunction::getGamma() {return m_gamma;};
+
+double NegativeCrystalBallFunction::getAlpha() {return m_alpha;};
+double NegativeCrystalBallFunction::getN() {return m_n;};
+
+
 /*
 ###################
 //Function eval
 ###################
 */ 
 double FiniteFunction::invxsquared(double x) {return 1/(1+x*x);};
-double FiniteFunction::callFunction(double x) {return this->invxsquared(x);}; //(overridable)
+
+// Normal distribution function
+double NormalFunction::normalDistribution(double x) {
+    if (m_stddev == 0.0) {
+        // Handle the error, for example, throw an exception
+        throw std::invalid_argument("For normal distribution, standard deviation must be non-zero");
+    }
+    return 1.0 / (m_stddev * sqrt(2 * M_PI)) * exp(-0.5 * pow((x - m_mean) / m_stddev, 2));
+}
+
+// Cauchy-Lorentz distribution function
+double CauchyLorentzFunction::cauchylorentzDistribution(double x) {
+    if (m_gamma <= 0.0) {
+        // Handle the error, for example, throw an exception
+        throw std::invalid_argument("For Cauchy-Lorentz distribution, gamma must be greater than zero");
+    }
+    return 1.0 / (M_PI * m_gamma * (1 + pow((x - m_x0) / m_gamma, 2)));
+}
+
+double NegativeCrystalBallFunction::negativeCrystalBallFunction(double x) {
+    if (m_stddev == 0.0) {
+        // Handle the error, for example, throw an exception
+        throw std::invalid_argument("For negative crystal ball distribution, standard deviation must be non-zero.");
+    }
+    if (m_n <= 1.0) {
+        // Handle the error, for example, throw an exception
+        throw std::invalid_argument("For negative crystal ball distribution, n must be greater than one.");
+    }
+    if (m_alpha <= 0.0) {
+        // Handle the error, for example, throw an exception
+        throw std::invalid_argument("For negative crystal ball distribution, alpha must be greater than zero.");
+    }
+
+    double A = pow(m_n / m_alpha, m_n) * exp(-0.5 * pow(m_alpha, 2));
+    double B = m_n / m_alpha - m_alpha;
+    double C = m_n / m_alpha * (1.0 / (m_n - 1)) * exp(-0.5 * pow(m_alpha, 2));
+    double D = sqrt(M_PI / 2) * (1 + erf(m_alpha / sqrt(2)));
+    double N = 1.0 / (m_stddev * (C + D));
+    if ((x - m_mean)/m_stddev <= -m_alpha) {
+        return N * A * pow(B - (x - m_mean) / m_stddev, -m_n);
+    }
+    else {
+        return N * exp(-0.5 * pow((x - m_mean) / m_stddev, 2));
+    }
+}
+
+// Overrides of callFunction for the different distributions
+double FiniteFunction::callFunction(double x) {return this->invxsquared(x);}; 
+double NormalFunction::callFunction(double x) {return this->normalDistribution(x);};
+double CauchyLorentzFunction::callFunction(double x) {return this->cauchylorentzDistribution(x);};
+double NegativeCrystalBallFunction::callFunction(double x) {return this->negativeCrystalBallFunction(x);};
+
 
 /*
 ###################
@@ -105,6 +206,25 @@ void FiniteFunction::printInfo(){
   std::cout << "rangeMax: " << m_RMax << std::endl;
   std::cout << "integral: " << m_Integral << ", calculated using " << m_IntDiv << " divisions" << std::endl;
   std::cout << "function: " << m_FunctionName << std::endl;
+}
+//Override the base class printInfo function
+void NormalFunction::printInfo(){ //Override the base class printInfo function
+  FiniteFunction::printInfo(); //Call the base class printInfo function
+  std::cout << "stddev: " << m_stddev << std::endl; //add the extra info for the normal distribution
+  std::cout << "mean: " << m_mean << std::endl;
+  }
+
+  //Override the base class printInfo function
+void CauchyLorentzFunction::printInfo(){ //Override the base class printInfo function
+  FiniteFunction::printInfo(); //Call the base class printInfo function
+  std::cout << "x0 " << m_x0 << std::endl; //add the extra info for the normal distribution
+  std::cout << "gamma: " << m_gamma << std::endl;
+  }
+
+void NegativeCrystalBallFunction::printInfo() {
+    NormalFunction::printInfo();
+    std::cout << "alpha: " << m_alpha << std::endl;
+    std::cout << "n: " << m_n << std::endl;
 }
 
 /*

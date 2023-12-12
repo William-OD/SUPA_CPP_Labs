@@ -30,24 +30,38 @@ int main() {
         testData.push_back(dataLine);
     }
     MysteryData.close();
-    std::cout << "************************************" << std::endl;
-    std::cout << "Read in " << testData.size() << " points." << std::endl;
-    std::cout << "************************************" << std::endl;
-
     
 // Test: Create a default FiniteFunction
     FiniteFunction defaultFunction;
-    // Print information about the default function
-    std::cout << "Default Function Info:" << std::endl;
+
     defaultFunction.printInfo();
-    // Compute and print the integral
-    std::cout << "Integral: " << defaultFunction.integral() << std::endl;
-
-// Plot the default function
     defaultFunction.plotFunction();
+    defaultFunction.plotData(testData, 100, true);
 
-// // Plot the data points
-    defaultFunction.plotData(testData, 150, true);
+// Normal Distribution Test
+    NormalFunction normal;
+    normal.setMean(-3.0);
+    normal.setStdDev(2.0);
+    normal.printInfo();
+    normal.plotFunction();
+    normal.plotData(testData, 100, true);   
 
-    return 0;
+// Cauchy-Lorentz Distribution Test
+    CauchyLorentzFunction cauchy;
+    cauchy.setX0(-3.0);
+    cauchy.setGamma(2.0);
+    cauchy.printInfo();
+    cauchy.plotFunction();
+    cauchy.plotData(testData, 10, true);
+
+// Negative Crystal Ball Distribution Test
+    NegativeCrystalBallFunction ncb;
+    ncb.setMean(-3.0);
+    ncb.setStdDev(2.0);
+    ncb.setAlpha(1.25);
+    ncb.setN(1.5);
+    ncb.printInfo();
+    ncb.plotFunction();
+    ncb.plotData(testData, 100, true);
+return 0;
 }
