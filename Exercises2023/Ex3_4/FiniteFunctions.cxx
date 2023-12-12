@@ -10,8 +10,8 @@ using std::filesystem::path;
 
 //Empty constructor
 FiniteFunction::FiniteFunction(){
-  m_RMin = -5.0;
-  m_RMax = 5.0;
+  m_RMin = -10.0;
+  m_RMax = 10.0;
   this->checkPath("DefaultFunction");
   m_Integral = NULL;
 }
@@ -61,9 +61,17 @@ double FiniteFunction::callFunction(double x) {return this->invxsquared(x);}; //
 Integration by hand (output needed to normalise function when plotting)
 ###################
 */ 
-double FiniteFunction::integrate(int Ndiv){ //private
-  //ToDo write an integrator
-  return -99;  
+double FiniteFunction::integrate(int Ndiv){               //private
+// Integration using the trapezoidal rule
+  double h = (m_RMax - m_RMin) / static_cast<double>(Ndiv);
+  double integral = 0.5 * (callFunction(m_RMin) + callFunction(m_RMax));
+
+  for (int i = 1; i < Ndiv; ++i) {
+      double x = m_RMin + i * h;
+      integral += callFunction(x);
+  }
+  integral *= h;
+  return integral;
 }
 double FiniteFunction::integral(int Ndiv) { //public
   if (Ndiv <= 0){
@@ -162,6 +170,9 @@ std::vector< std::pair<double,double> > FiniteFunction::makeHist(std::vector<dou
   for (double point : points){
     //Get bin index (starting from 0) the point falls into using point value, range, and Nbins
     int bindex = static_cast<int>(floor((point-m_RMin)/((m_RMax-m_RMin)/(double)Nbins)));
+    if (bindex<0 || bindex>Nbins-1){
+      continue;
+    }
     bins[bindex]++; //weight of 1 for each data point
     norm++; //Total number of data points
   }
