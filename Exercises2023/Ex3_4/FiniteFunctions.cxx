@@ -3,6 +3,7 @@
 #include <vector>
 #include "FiniteFunctions.h"
 #include <filesystem> //To check extensions in a nice way
+#include <random>
 
 #include "gnuplot-iostream.h" //Needed to produce plots (not part of the course) 
 
@@ -177,6 +178,7 @@ double FiniteFunction::integrate(int Ndiv){               //private
 double FiniteFunction::integral(int Ndiv) { //public
   if (Ndiv <= 0){
     std::cout << "Invalid number of divisions for integral, setting Ndiv to 1000" <<std::endl;
+    std::cout << "--------------------------------------------------" << std::endl;
     Ndiv = 1000;
   }
   if (m_Integral == NULL || Ndiv != m_IntDiv){
@@ -198,14 +200,18 @@ void FiniteFunction::checkPath(std::string outfile){
  m_FunctionName = fp.stem(); 
  m_OutData = m_FunctionName+".data";
  m_OutPng = m_FunctionName+".png";
-}
+} 
 
 //Print (overridable)
 void FiniteFunction::printInfo(){
+  std::cout << std::endl;
+  std::cout << std::endl;
+  std::cout << "--------------------------------------------------" << std::endl;
+  std::cout << "function: " << m_FunctionName << std::endl;
+  std::cout << "--------------------------------------------------" << std::endl;
   std::cout << "rangeMin: " << m_RMin << std::endl;
   std::cout << "rangeMax: " << m_RMax << std::endl;
   std::cout << "integral: " << m_Integral << ", calculated using " << m_IntDiv << " divisions" << std::endl;
-  std::cout << "function: " << m_FunctionName << std::endl;
 }
 //Override the base class printInfo function
 void NormalFunction::printInfo(){ //Override the base class printInfo function
@@ -252,6 +258,68 @@ void FiniteFunction::plotData(std::vector<double> &points, int Nbins, bool isdat
   }
 }
 
+/*
+######################
+// Metroplis Algorithm
+######################
+*/
+
+// Metropolis algorithm takes the number of samples and a proposal standard deviation as arguments.
+void FiniteFunction::metropolisSampling(int numSamples, float proposalStd) {
+    // Step 1: Generate a random number 'xi' within the function's defined range, sampled from a uniform distribution.
+    std::vector<double> sampleData; // Vector for storing the accepted sample data
+    double randomX[numSamples];
+    double randomY[numSamples];
+    double randomT[numSamples];
+
+    int randomNum = 1;
+    std::random_device rd;
+    std::mt19937 mtEngine{rd()}; // Mersenne Twister engine = random number generator. Found online and built in with <random>
+    std::uniform_real_distribution<float> rndNumber{m_RMin, m_RMax};
+
+    for (int j = 0; j < randomNum; j++) {
+        // Step 1: Generate an initial random sample 'xi' from a uniform distribution
+        double rndX = rndNumber(mtEngine);
+        randomX[j] = rndX;
+    }
+
+    for (int i = 0; i < numSamples; i++) {
+        // Step 2: Generate a second random sample 'y' from a normal distribution centered on 'xi' with the specified standard deviation.
+        float centreNorm = randomX[i];
+        float width = proposalStd;
+        std::normal_distribution<float> normalPDF{centreNorm, width};
+        double rndY = normalPDF(mtEngine);
+        randomY[i] = rndY;
+
+        // Step 3: Compute acceptance probability 'A = min(f(y) / f(xi), 1)', where 'f' is the function.
+        double A;
+        if (callFunction(randomY[i]) / callFunction(randomX[i]) < 1) {
+            A = callFunction(randomY[i]) / callFunction(randomX[i]);
+        } else {
+            A = 1;
+        }
+
+        // Step 4: Generate a random number 'T' between 0 and 1. If 'T < A', then accept 'y'.
+        int tMin = 0;
+        int tMax = 1;
+        std::uniform_real_distribution<float> rndTNumber{tMin, tMax};
+        double rndT = rndTNumber(mtEngine);
+        randomT[i] = rndT;
+
+        if (randomT[i] < A) {
+            // Step 5: If 'y' is accepted, set 'xi+1 = y'.
+            randomX[i + 1] = randomY[i];
+        } else {
+            // If 'y' is not accepted, set 'xi+1 = xi'.
+            randomX[i + 1] = randomX[i];
+        }
+
+        // Store the accepted sample
+        sampleData.push_back(randomX[i + 1]);
+        this->plotData(sampleData, 100, false); // Plot the sampled data using 100 bins
+    }
+}
+
 
 /*
   #######################################################################################################
@@ -273,6 +341,7 @@ std::vector< std::pair<double,double> > FiniteFunction::scanFunction(int Nscan){
     this->integral(Nscan);
     std::cout << "integral: " << m_Integral << ", calculated using " << Nscan << " divisions" << std::endl;
   }
+    std::cout << "--------------------------------------------------" << std::endl;
   //For each scan point push back the x and y values 
   for (int i = 0; i < Nscan; i++){
     function_scan.push_back( std::make_pair(x,this->callFunction(x)/m_Integral));
@@ -363,3 +432,4 @@ void FiniteFunction::generatePlot(Gnuplot &gp){
     gp.send1d(m_samples);
   }
 }
+ 

@@ -31,12 +31,14 @@ int main() {
     }
     MysteryData.close();
     
+
 // Test: Create a default FiniteFunction
     FiniteFunction defaultFunction;
-
     defaultFunction.printInfo();
     defaultFunction.plotFunction();
     defaultFunction.plotData(testData, 100, true);
+    defaultFunction.metropolisSampling(10000, 1.2);
+
 
 // Normal Distribution Test
     NormalFunction normal;
@@ -45,6 +47,8 @@ int main() {
     normal.printInfo();
     normal.plotFunction();
     normal.plotData(testData, 100, true);   
+    normal.metropolisSampling(10000, 1.2);
+
 
 // Cauchy-Lorentz Distribution Test
     CauchyLorentzFunction cauchy;
@@ -52,7 +56,8 @@ int main() {
     cauchy.setGamma(2.0);
     cauchy.printInfo();
     cauchy.plotFunction();
-    cauchy.plotData(testData, 10, true);
+    cauchy.plotData(testData, 100, true);
+    cauchy.metropolisSampling(10000, 1.2);
 
 // Negative Crystal Ball Distribution Test
     NegativeCrystalBallFunction ncb;
@@ -63,5 +68,7 @@ int main() {
     ncb.printInfo();
     ncb.plotFunction();
     ncb.plotData(testData, 100, true);
+    ncb.metropolisSampling(10000, 1.2);
+    
 return 0;
 }
